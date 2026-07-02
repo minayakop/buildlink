@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}تسجيل الدخول — BuildLink{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div style="background:#fff;border-radius:20px;padding:40px;border:0.5px solid #dde3eb;">
+
+                <div class="text-center mb-4">
+                    <svg width="48" height="48" viewBox="0 0 36 36" fill="none" class="mb-3">
+                        <rect x="3" y="18" width="14" height="15" rx="2" fill="#C9A96E"/>
+                        <rect x="19" y="10" width="14" height="23" rx="2" fill="#0a1628" opacity="0.85"/>
+                        <polygon points="18,3 34,13 34,11 18,1 2,11 2,13" fill="#0a1628"/>
+                    </svg>
+                    <h4 style="font-weight:800;color:var(--navy);">تسجيل الدخول</h4>
+                    <p style="color:var(--gray);font-size:0.9rem;">أهلاً بك في BuildLink</p>
+                </div>
+
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} rounded-3 mb-3">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">اسم المستخدم</label>
+                        <input type="text" name="username" class="form-control" required
+                               placeholder="اسم المستخدم">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">كلمة المرور</label>
+                        <input type="password" name="password" class="form-control" required
+                               placeholder="كلمة المرور">
+                    </div>
+                    <button type="submit" class="btn-gold w-100 py-3" style="border-radius:12px;font-size:1rem;">
+                        <i class="fas fa-sign-in-alt me-2"></i>دخول
+                    </button>
+                </form>
+
+                <hr style="border-color:#f0f4f8;margin:24px 0;">
+
+                <p class="text-center" style="color:var(--gray);font-size:0.9rem;">
+                    مش عندك حساب؟
+                    <a href="{% url 'accounts:register' %}" style="color:var(--gold);font-weight:700;">
+                        سجّل الآن
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

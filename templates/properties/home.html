@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}BuildLink — منصة العقارات الأولى في مصر{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<section style="background: var(--navy); padding: 80px 0 70px; position:relative; overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.03;">
+        <svg width="100%" height="100%">
+            <defs>
+                <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+                    <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)"/>
+        </svg>
+    </div>
+
+    <div class="container text-center" style="position:relative;">
+        <div style="display:inline-block;background:rgba(201,169,110,0.12);border:1px solid rgba(201,169,110,0.3);
+                    border-radius:50px;padding:6px 20px;margin-bottom:20px;">
+            <span style="color:var(--gold);font-size:0.82rem;font-weight:600;">
+                🏆 المنصة العقارية الأولى في مصر
+            </span>
+        </div>
+
+        <h1 style="color:#fff;font-size:2.8rem;font-weight:800;line-height:1.3;margin-bottom:14px;">
+            ابحث عن <span style="color:var(--gold);">عقارك المثالي</span>
+        </h1>
+        <p style="color:rgba(255,255,255,0.55);font-size:1.05rem;margin-bottom:36px;">
+            آلاف العقارات للبيع والإيجار في جميع أنحاء مصر
+        </p>
+
+        <!-- Search Box -->
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+                    border-radius:16px;padding:20px;max-width:700px;margin:0 auto 28px;">
+            <form action="{% url 'properties:list' %}" method="GET">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <select name="listing_type" class="form-select"
+                            style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+                                   color:#fff;border-radius:10px;padding:11px 14px;font-family:'Cairo',sans-serif;">
+                            <option value="" style="color:#000;">بيع أو إيجار؟</option>
+                            <option value="sale" style="color:#000;">للبيع</option>
+                            <option value="rent" style="color:#000;">للإيجار</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="city" class="form-select"
+                            style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+                                   color:#fff;border-radius:10px;padding:11px 14px;font-family:'Cairo',sans-serif;">
+                            <option value="" style="color:#000;">اختر المدينة</option>
+                            {% for city in cities %}
+                            <option value="{{ city.id }}" style="color:#000;">{{ city.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="search" placeholder="ابحث هنا..."
+                            style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+                                   color:#fff;border-radius:10px;padding:11px 14px;width:100%;
+                                   font-family:'Cairo',sans-serif;outline:none;">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn-gold w-100"
+                            style="border-radius:10px;padding:11px;font-size:0.95rem;">
+                            <i class="fas fa-search me-2"></i>ابحث الآن
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Stats -->
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+                        border-radius:50px;padding:10px 24px;">
+                <span style="color:var(--gold);font-weight:800;font-size:1.2rem;">{{ for_sale }}</span>
+                <span style="color:rgba(255,255,255,0.6);font-size:0.88rem;margin-right:6px;"> للبيع</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+                        border-radius:50px;padding:10px 24px;">
+                <span style="color:var(--gold);font-weight:800;font-size:1.2rem;">{{ for_rent }}</span>
+                <span style="color:rgba(255,255,255,0.6);font-size:0.88rem;margin-right:6px;"> للإيجار</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+                        border-radius:50px;padding:10px 24px;">
+                <span style="color:var(--gold);font-weight:800;font-size:1.2rem;">{{ cities.count }}</span>
+                <span style="color:rgba(255,255,255,0.6);font-size:0.88rem;margin-right:6px;"> مدينة</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FEATURED ===== -->
+{% if featured %}
+<section class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <h2 class="section-title mb-0">عقارات <span>مميزة</span></h2>
+            <div class="gold-divider"></div>
+        </div>
+        <a href="{% url 'properties:list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-4">
+            عرض الكل <i class="fas fa-arrow-left me-1"></i>
+        </a>
+    </div>
+    <div class="row g-4">
+        {% for p in featured %}
+        <div class="col-md-4">{% include 'properties/card.html' with property=p %}</div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ===== LATEST ===== -->
+<section style="background:#fff;padding:60px 0;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <h2 class="section-title mb-0">أحدث <span>العقارات</span></h2>
+                <div class="gold-divider"></div>
+            </div>
+            <a href="{% url 'properties:list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-4">
+                عرض الكل <i class="fas fa-arrow-left me-1"></i>
+            </a>
+        </div>
+        <div class="row g-4">
+            {% for p in latest %}
+            <div class="col-md-3">{% include 'properties/card.html' with property=p %}</div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <svg width="60" height="60" viewBox="0 0 36 36" fill="none" style="opacity:0.2;margin-bottom:16px;">
+                    <rect x="3" y="18" width="14" height="15" rx="2" fill="#0a1628"/>
+                    <rect x="19" y="10" width="14" height="23" rx="2" fill="#0a1628"/>
+                    <polygon points="18,3 34,13 34,11 18,1 2,11 2,13" fill="#0a1628"/>
+                </svg>
+                <p style="color:#8899aa;margin-bottom:16px;">لا توجد عقارات بعد</p>
+                <a href="/admin/properties/property/add/" class="btn btn-primary px-4">
+                    <i class="fas fa-plus me-2"></i>أضف أول عقار
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ===== WHY US ===== -->
+<section class="container my-5 py-3">
+    <div class="text-center mb-4">
+        <h2 class="section-title">لماذا <span>BuildLink</span>؟</h2>
+        <div class="gold-divider mx-auto"></div>
+    </div>
+    <div class="row g-4 text-center">
+        <div class="col-md-3">
+            <div style="background:#fff;border-radius:16px;padding:30px 20px;border:0.5px solid #dde3eb;height:100%;">
+                <div style="width:56px;height:56px;background:rgba(201,169,110,0.1);border-radius:14px;
+                            display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fas fa-search" style="color:var(--gold);font-size:1.4rem;"></i>
+                </div>
+                <h6 style="font-weight:700;color:var(--navy);margin-bottom:8px;">بحث سهل وسريع</h6>
+                <p style="color:#8899aa;font-size:0.88rem;line-height:1.7;">ابحث بالمنطقة والسعر والمواصفات بكل سهولة</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background:#fff;border-radius:16px;padding:30px 20px;border:0.5px solid #dde3eb;height:100%;">
+                <div style="width:56px;height:56px;background:rgba(201,169,110,0.1);border-radius:14px;
+                            display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fas fa-shield-alt" style="color:var(--gold);font-size:1.4rem;"></i>
+                </div>
+                <h6 style="font-weight:700;color:var(--navy);margin-bottom:8px;">إعلانات موثوقة</h6>
+                <p style="color:#8899aa;font-size:0.88rem;line-height:1.7;">كل الإعلانات مراجعة ومعتمدة لضمان مصداقيتها</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background:#fff;border-radius:16px;padding:30px 20px;border:0.5px solid #dde3eb;height:100%;">
+                <div style="width:56px;height:56px;background:rgba(201,169,110,0.1);border-radius:14px;
+                            display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fas fa-map-marked-alt" style="color:var(--gold);font-size:1.4rem;"></i>
+                </div>
+                <h6 style="font-weight:700;color:var(--navy);margin-bottom:8px;">خريطة تفاعلية</h6>
+                <p style="color:#8899aa;font-size:0.88rem;line-height:1.7;">شوف العقارات على الخريطة واختار موقعك المناسب</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background:#fff;border-radius:16px;padding:30px 20px;border:0.5px solid #dde3eb;height:100%;">
+                <div style="width:56px;height:56px;background:rgba(201,169,110,0.1);border-radius:14px;
+                            display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fas fa-headset" style="color:var(--gold);font-size:1.4rem;"></i>
+                </div>
+                <h6 style="font-weight:700;color:var(--navy);margin-bottom:8px;">دعم على مدار الساعة</h6>
+                <p style="color:#8899aa;font-size:0.88rem;line-height:1.7;">فريقنا جاهز لمساعدتك في أي وقت</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

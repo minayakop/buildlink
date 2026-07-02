@@ -1,0 +1,56 @@
+<div class="prop-card h-100">
+    <div style="position:relative;">
+        {% with property.images.first as img %}
+            {% if img %}
+                <img src="{{ img.image.url }}" alt="{{ property.title }}" class="prop-card-img">
+            {% else %}
+                <div class="prop-card-no-img">
+                    <svg width="50" height="50" viewBox="0 0 36 36" fill="none" opacity="0.3">
+                        <rect x="3" y="18" width="14" height="15" rx="2" fill="white"/>
+                        <rect x="19" y="10" width="14" height="23" rx="2" fill="white"/>
+                        <polygon points="18,3 34,13 34,11 18,1 2,11 2,13" fill="white"/>
+                    </svg>
+                </div>
+            {% endif %}
+        {% endwith %}
+        <div style="position:absolute;top:10px;right:10px;display:flex;gap:6px;">
+            {% if property.listing_type == 'sale' %}
+                <span class="badge-sale">للبيع</span>
+            {% else %}
+                <span class="badge-rent">للإيجار</span>
+            {% endif %}
+        </div>
+        {% if property.is_featured %}
+        <div style="position:absolute;top:10px;left:10px;">
+            <span class="badge-featured">⭐ مميز</span>
+        </div>
+        {% endif %}
+    </div>
+    <div class="p-3">
+        <h6 style="font-weight:700;color:var(--navy);margin-bottom:5px;font-size:0.95rem;">
+            {{ property.title|truncatechars:45 }}
+        </h6>
+        <p style="color:var(--gray);font-size:0.82rem;margin-bottom:10px;">
+            <i class="fas fa-map-marker-alt me-1" style="color:var(--gold);"></i>
+            {{ property.city }}{% if property.district %} — {{ property.district }}{% endif %}
+        </p>
+        <div class="d-flex gap-3 mb-3 card-specs">
+            {% if property.bedrooms %}
+            <span><i class="fas fa-bed me-1"></i>{{ property.bedrooms }}</span>
+            {% endif %}
+            {% if property.bathrooms %}
+            <span><i class="fas fa-bath me-1"></i>{{ property.bathrooms }}</span>
+            {% endif %}
+            <span><i class="fas fa-expand-arrows-alt me-1"></i>{{ property.area }}م²</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="price-tag">
+                {{ property.price|floatformat:0 }}
+                <small>جنيه</small>
+            </span>
+            <a href="{% url 'properties:detail' property.pk %}" class="btn btn-primary btn-sm px-3">
+                التفاصيل
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BuildLink{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy     : #0a1628;
+            --navy-2   : #1a3a5c;
+            --gold     : #C9A96E;
+            --gold-dark: #a8864f;
+            --light-bg : #f0f4f8;
+            --gray     : #8899aa;
+            --shadow   : 0 4px 24px rgba(10,22,40,0.10);
+        }
+
+        * { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--light-bg); color: var(--navy); }
+
+        .navbar {
+            background: var(--navy) !important;
+            padding: 12px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.3px;
+        }
+        .navbar-brand .brand-gold { color: var(--gold); }
+        .nav-link {
+            color: rgba(255,255,255,0.65) !important;
+            font-weight: 500;
+            font-size: 0.92rem;
+            transition: color 0.2s;
+            padding: 6px 14px !important;
+        }
+        .nav-link:hover { color: var(--gold) !important; }
+        .nav-link.active { color: var(--gold) !important; }
+        .btn-add {
+            background: var(--gold);
+            color: var(--navy) !important;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 7px 20px !important;
+            font-size: 0.88rem;
+            transition: background 0.2s;
+        }
+        .btn-add:hover { background: var(--gold-dark); color: #fff !important; }
+
+        .logo-icon { width: 30px; height: 30px; }
+
+        .prop-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 0.5px solid #dde3eb;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .prop-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(10,22,40,0.13);
+        }
+        .prop-card-img { height: 200px; object-fit: cover; width: 100%; }
+        .prop-card-no-img {
+            height: 200px;
+            background: linear-gradient(135deg, var(--navy), var(--navy-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .badge-sale {
+            background: var(--navy);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .badge-rent {
+            background: var(--gold);
+            color: var(--navy);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .badge-featured {
+            background: rgba(201,169,110,0.92);
+            color: var(--navy);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+        .price-tag { color: var(--navy); font-size: 1.15rem; font-weight: 800; }
+        .price-tag small { color: var(--gray); font-size: 0.75rem; font-weight: 400; }
+
+        .btn-primary {
+            background: var(--navy) !important;
+            border: none !important;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-primary:hover { background: var(--navy-2) !important; transform: translateY(-1px); }
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy);
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            padding: 10px 24px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .btn-gold:hover { background: var(--gold-dark); }
+
+        .section-title { font-size: 1.6rem; font-weight: 800; color: var(--navy); }
+        .section-title span { color: var(--gold); }
+
+        .gold-divider {
+            width: 50px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 2px;
+            margin: 8px 0 20px;
+        }
+
+        .card-specs span { font-size: 0.82rem; color: var(--gray); }
+        .text-gold { color: var(--gold); }
+        .bg-navy { background: var(--navy); }
+
+        footer {
+            background: var(--navy);
+            color: rgba(255,255,255,0.6);
+            padding: 50px 0 24px;
+            margin-top: 70px;
+        }
+        footer h5 { color: #fff; font-weight: 700; margin-bottom: 16px; font-size: 1rem; }
+        footer a {
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 8px;
+            transition: color 0.2s;
+        }
+        footer a:hover { color: var(--gold); }
+        .footer-logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .footer-logo span { color: var(--gold); }
+        .footer-divider { border-color: rgba(255,255,255,0.08); margin: 30px 0 20px; }
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.6);
+            margin-left: 8px;
+            transition: background 0.2s, color 0.2s;
+            text-decoration: none !important;
+        }
+        .social-icon:hover { background: var(--gold); color: var(--navy) !important; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'properties:home' %}">
+            <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+                <rect x="3" y="18" width="14" height="15" rx="2" fill="#C9A96E"/>
+                <rect x="19" y="10" width="14" height="23" rx="2" fill="white" opacity="0.9"/>
+                <polygon points="18,3 34,13 34,11 18,1 2,11 2,13" fill="#C9A96E"/>
+            </svg>
+            Build<span class="brand-gold">Link</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <i class="fas fa-bars text-white"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 me-4">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                       href="{% url 'properties:home' %}">الرئيسية</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'list' and request.resolver_match.app_name == 'properties' %}active{% endif %}"
+                       href="{% url 'properties:list' %}">كل العقارات</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'properties:list' %}?listing_type=sale">للبيع</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'properties:list' %}?listing_type=rent">للإيجار</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}"
+                       href="{% url 'properties:map' %}">
+                        <i class="fas fa-map-marked-alt me-1"></i>الخريطة
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.app_name == 'services' %}active{% endif %}"
+                       href="{% url 'services:list' %}">
+                        <i class="fas fa-hard-hat me-1"></i>التشطيبات
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}"
+                       href="{% url 'subscriptions:pricing' %}">
+                        <i class="fas fa-tags me-1"></i>الأسعار
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav align-items-center gap-2">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:profile' %}">
+                        <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-add" href="{% url 'properties:add' %}">
+                        <i class="fas fa-plus me-1"></i>أضف عقار
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:login' %}">
+                        <i class="fas fa-sign-in-alt me-1"></i>دخول
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-add" href="{% url 'accounts:register' %}">
+                        <i class="fas fa-user-plus me-1"></i>سجّل مجاناً
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-logo">
+                    <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+                        <rect x="3" y="18" width="14" height="15" rx="2" fill="#C9A96E"/>
+                        <rect x="19" y="10" width="14" height="23" rx="2" fill="white" opacity="0.85"/>
+                        <polygon points="18,3 34,13 34,11 18,1 2,11 2,13" fill="#C9A96E"/>
+                    </svg>
+                    Build<span>Link</span>
+                </div>
+                <p style="font-size:0.88rem;line-height:1.7;margin-bottom:16px;">
+                    منصة العقارات والتشطيبات الأولى في مصر —
+                    نجمع المشترين والبائعين والمقاولين في مكان واحد.
+                </p>
+                <div>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h5>العقارات</h5>
+                <a href="{% url 'properties:list' %}?listing_type=sale">شقق للبيع</a>
+                <a href="{% url 'properties:list' %}?listing_type=rent">شقق للإيجار</a>
+                <a href="{% url 'properties:list' %}">فيلات</a>
+                <a href="{% url 'properties:list' %}">أراضي</a>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h5>الخدمات</h5>
+                <a href="{% url 'services:list' %}">مقاولون وتشطيبات</a>
+                <a href="{% url 'services:add' %}">أضف خدمتك</a>
+                <a href="{% url 'properties:map' %}">خريطة العقارات</a>
+                <a href="{% url 'subscriptions:pricing' %}">باقات الاشتراك</a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <h5>تواصل معنا</h5>
+                <p style="font-size:0.88rem;margin-bottom:8px;">
+                    <i class="fas fa-envelope me-2 text-gold"></i>info@buildlink.com
+                </p>
+                <p style="font-size:0.88rem;margin-bottom:8px;">
+                    <i class="fas fa-phone me-2 text-gold"></i>01000000000
+                </p>
+                <p style="font-size:0.88rem;">
+                    <i class="fas fa-map-marker-alt me-2 text-gold"></i>القاهرة، مصر
+                </p>
+            </div>
+        </div>
+        <hr class="footer-divider">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <p style="font-size:0.82rem;margin:0;">© 2024 BuildLink — جميع الحقوق محفوظة</p>
+            <p style="font-size:0.82rem;margin:0;">صُنع بـ <span class="text-gold">♥</span> في مصر</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

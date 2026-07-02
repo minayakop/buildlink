@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}BuildLink — قائمة العقارات{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-4">
+
+        <!-- Sidebar فلترة -->
+        <div class="col-md-3">
+            <div style="background:#fff;border-radius:16px;padding:24px;border:0.5px solid #dde3eb;position:sticky;top:80px;">
+                <h6 style="font-weight:700;color:var(--navy);margin-bottom:16px;">
+                    <i class="fas fa-filter me-2" style="color:var(--gold);"></i>فلترة النتائج
+                </h6>
+                <form method="GET">
+                    <div class="mb-3">
+                        <label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block;">نوع الإعلان</label>
+                        <select name="listing_type" class="form-select form-select-sm">
+                            <option value="">الكل</option>
+                            <option value="sale" {% if request.GET.listing_type == 'sale' %}selected{% endif %}>للبيع</option>
+                            <option value="rent" {% if request.GET.listing_type == 'rent' %}selected{% endif %}>للإيجار</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block;">المدينة</label>
+                        <select name="city" class="form-select form-select-sm">
+                            <option value="">الكل</option>
+                            {% for city in cities %}
+                            <option value="{{ city.id }}" {% if request.GET.city == city.id|stringformat:"s" %}selected{% endif %}>
+                                {{ city.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block;">نوع العقار</label>
+                        <select name="property_type" class="form-select form-select-sm">
+                            <option value="">الكل</option>
+                            {% for pt in property_types %}
+                            <option value="{{ pt.id }}">{{ pt.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block;">السعر من</label>
+                        <input type="number" name="min_price" class="form-control form-control-sm"
+                               placeholder="0" value="{{ request.GET.min_price }}">
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block;">السعر إلى</label>
+                        <input type="number" name="max_price" class="form-control form-control-sm"
+                               placeholder="بلا حد" value="{{ request.GET.max_price }}">
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block;">غرف النوم</label>
+                        <select name="bedrooms" class="form-select form-select-sm">
+                            <option value="">الكل</option>
+                            <option value="1">1 غرفة</option>
+                            <option value="2">2 غرفة</option>
+                            <option value="3">3 غرف</option>
+                            <option value="4">4 غرف</option>
+                            <option value="5">5+ غرف</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 btn-sm mb-2">
+                        <i class="fas fa-search me-1"></i>بحث
+                    </button>
+                    <a href="{% url 'properties:list' %}" class="btn btn-outline-secondary w-100 btn-sm">
+                        إعادة ضبط
+                    </a>
+                </form>
+            </div>
+        </div>
+
+        <!-- النتائج -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 style="font-weight:700;color:var(--navy);margin-bottom:0;">
+                        نتائج البحث
+                        <span style="color:var(--gold);">({{ total }} عقار)</span>
+                    </h5>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                {% for p in properties %}
+                <div class="col-md-4">
+                    {% include 'properties/card.html' with property=p %}
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-search fa-3x mb-3" style="color:#dde3eb;"></i>
+                    <p style="color:#8899aa;">لا توجد نتائج — جرب فلتر مختلف</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if properties.has_other_pages %}
+            <nav class="mt-5">
+                <ul class="pagination justify-content-center gap-1">
+                    {% if properties.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ properties.previous_page_number }}"
+                           style="border-radius:8px;color:var(--navy);border-color:#dde3eb;">السابق</a>
+                    </li>
+                    {% endif %}
+                    {% for num in properties.paginator.page_range %}
+                    <li class="page-item {% if properties.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}"
+                           style="border-radius:8px;{% if properties.number == num %}background:var(--navy);border-color:var(--navy);{% else %}color:var(--navy);border-color:#dde3eb;{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% if properties.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ properties.next_page_number }}"
+                           style="border-radius:8px;color:var(--navy);border-color:#dde3eb;">التالي</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}خدمات التشطيب والمقاولين — BuildLink{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h2 class="section-title">خدمات <span>التشطيب والمقاولين</span></h2>
+        <div class="gold-divider mx-auto"></div>
+        <p style="color:var(--gray);">ابحث عن أفضل المقاولين وشركات التشطيب في مصر</p>
+    </div>
+
+    <!-- Categories -->
+    <div class="d-flex gap-2 flex-wrap justify-content-center mb-4">
+        <a href="{% url 'services:list' %}"
+           class="btn btn-sm {% if not request.GET.category %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
+            الكل
+        </a>
+        {% for cat in categories %}
+        <a href="?category={{ cat.id }}"
+           class="btn btn-sm {% if request.GET.category == cat.id|stringformat:'s' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-4">
+            <i class="fas fa-{{ cat.icon }} me-1"></i>{{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Search -->
+    <div style="background:#fff;border-radius:16px;padding:16px 20px;
+                border:0.5px solid #dde3eb;margin-bottom:24px;">
+        <form method="GET" class="d-flex gap-3 align-items-center flex-wrap">
+            {% if request.GET.category %}
+            <input type="hidden" name="category" value="{{ request.GET.category }}">
+            {% endif %}
+            <input type="text" name="search" value="{{ request.GET.search }}"
+                   class="form-control" style="max-width:300px;"
+                   placeholder="ابحث عن مقاول أو شركة...">
+            <input type="text" name="city" value="{{ request.GET.city }}"
+                   class="form-control" style="max-width:200px;"
+                   placeholder="المدينة">
+            <button type="submit" class="btn-gold px-4 py-2" style="border-radius:10px;">
+                <i class="fas fa-search me-1"></i>بحث
+            </button>
+            <span style="color:var(--gold);font-weight:700;margin-right:auto;">
+                {{ total }} خدمة
+            </span>
+        </form>
+    </div>
+
+    <!-- Services Grid -->
+    <div class="row g-4">
+        {% for service in services %}
+        <div class="col-md-4">
+            <div class="prop-card h-100">
+                <!-- صورة -->
+                <div style="position:relative;">
+                    {% with service.images.first as img %}
+                    {% if img %}
+                    <img src="{{ img.image.url }}" alt="{{ service.name }}" class="prop-card-img">
+                    {% else %}
+                    <div class="prop-card-no-img">
+                        <i class="fas fa-hard-hat fa-3x" style="color:rgba(255,255,255,0.3);"></i>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    {% if service.is_featured %}
+                    <div style="position:absolute;top:10px;right:10px;">
+                        <span class="badge-featured">⭐ مميز</span>
+                    </div>
+                    {% endif %}
+                    {% if service.category %}
+                    <div style="position:absolute;top:10px;left:10px;
+                                background:var(--navy);color:#fff;padding:4px 10px;
+                                border-radius:20px;font-size:0.75rem;font-weight:700;">
+                        {{ service.category.name }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- تفاصيل -->
+                <div class="p-3">
+                    <h6 style="font-weight:700;color:var(--navy);margin-bottom:4px;">
+                        {{ service.name }}
+                    </h6>
+                    <p style="color:var(--gray);font-size:0.82rem;margin-bottom:8px;">
+                        <i class="fas fa-map-marker-alt me-1" style="color:var(--gold);"></i>
+                        {{ service.city }}
+                        {% if service.experience_years %}
+                        &nbsp;|&nbsp;
+                        <i class="fas fa-briefcase me-1"></i>{{ service.experience_years }} سنة خبرة
+                        {% endif %}
+                    </p>
+
+                    <!-- التقييم -->
+                    <div class="d-flex align-items-center gap-1 mb-2">
+                        {% for i in "12345" %}
+                        <i class="fas fa-star" style="font-size:0.75rem;
+                           color:{% if forloop.counter <= service.rating %}#f59e0b{% else %}#dde3eb{% endif %};"></i>
+                        {% endfor %}
+                        <span style="font-size:0.8rem;color:var(--gray);margin-right:4px;">
+                            ({{ service.reviews_count }})
+                        </span>
+                    </div>
+
+                    <!-- السعر -->
+                    {% if service.min_price %}
+                    <p style="color:var(--gold);font-weight:700;font-size:0.9rem;margin-bottom:10px;">
+                        من {{ service.min_price|floatformat:0 }} جنيه
+                    </p>
+                    {% endif %}
+
+                    <a href="{% url 'services:detail' service.pk %}"
+                       class="btn btn-primary btn-sm w-100">
+                        عرض التفاصيل
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-hard-hat fa-3x mb-3" style="color:#dde3eb;"></i>
+            <p style="color:var(--gray);">لا توجد خدمات بعد</p>
+            {% if user.is_authenticated %}
+            <a href="{% url 'services:add' %}" class="btn-gold px-4 py-2"
+               style="border-radius:10px;text-decoration:none;">
+                أضف خدمتك
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

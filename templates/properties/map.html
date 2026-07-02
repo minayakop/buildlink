@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% block title %}خريطة العقارات — BuildLink{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
+<style>
+    #map {
+        height: 580px;
+        width: 100%;
+        border-radius: 16px;
+        border: 0.5px solid #dde3eb;
+        z-index: 1;
+        display: block;
+    }
+    .map-filter-bar {
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px 20px;
+        border: 0.5px solid #dde3eb;
+        margin-bottom: 16px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px !important;
+        box-shadow: 0 8px 30px rgba(10,22,40,0.15) !important;
+        font-family: 'Cairo', sans-serif !important;
+    }
+    .popup-card { min-width: 200px; direction: rtl; }
+    .popup-title { font-weight: 700; color: #0a1628; font-size: 0.95rem; margin-bottom: 4px; }
+    .popup-price { color: #C9A96E; font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
+    .popup-info { color: #8899aa; font-size: 0.82rem; margin-bottom: 10px; }
+    .popup-btn {
+        background: #0a1628;
+        color: #fff !important;
+        padding: 6px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .map-stats {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+    .map-stat {
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px 20px;
+        border: 0.5px solid #dde3eb;
+        font-size: 0.88rem;
+        color: #0a1628;
+    }
+    .map-stat span { color: #C9A96E; font-weight: 800; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+    <!-- Header -->
+    <div class="mb-3">
+        <h2 class="section-title mb-0">خريطة <span>العقارات</span></h2>
+        <div class="gold-divider"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="map-stats">
+        <div class="map-stat">إجمالي العقارات: <span id="total-count">0</span></div>
+        <div class="map-stat">للبيع: <span id="sale-count">0</span></div>
+        <div class="map-stat">للإيجار: <span id="rent-count">0</span></div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="map-filter-bar">
+        <select id="filter-type" class="form-select form-select-sm" style="width:150px;">
+            <option value="">الكل</option>
+            <option value="sale">للبيع</option>
+            <option value="rent">للإيجار</option>
+        </select>
+        <select id="filter-city" class="form-select form-select-sm" style="width:150px;">
+            <option value="">كل المدن</option>
+            {% for city in cities %}
+            <option value="{{ city.name }}">{{ city.name }}</option>
+            {% endfor %}
+        </select>
+        <button onclick="resetFilters()" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-redo me-1"></i>إعادة ضبط
+        </button>
+        <a href="{% url 'properties:list' %}" class="btn btn-sm ms-auto"
+           style="background:var(--navy);color:#fff;border-radius:8px;">
+            <i class="fas fa-list me-1"></i>عرض القائمة
+        </a>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+<script>
+    const properties = [
+        {% for p in properties %}
+        {
+            id: {{ p.pk }},
+            title: "{{ p.title|escapejs }}",
+            price: "{{ p.price|floatformat:0 }}",
+            city: "{{ p.city }}",
+            listing_type: "{{ p.listing_type }}",
+            bedrooms: {{ p.bedrooms|default:0 }},
+            area: {{ p.area }},
+            lat: {% if p.latitude %}{{ p.latitude }}{% else %}null{% endif %},
+            lng: {% if p.longitude %}{{ p.longitude }}{% else %}null{% endif %},
+            url: "{% url 'properties:detail' p.pk %}"
+        },
+        {% endfor %}
+    ];
+
+    // إنشاء الخريطة
+    const map = L.map('map', {
+        center: [26.8206, 30.8025],
+        zoom: 6,
+        zoomControl: true
+    });
+
+    // طبقة OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+    }).addTo(map);
+
+    // أيقونة للبيع
+    const saleIcon = L.divIcon({
+        html: `<div style="background:#0a1628;color:#C9A96E;padding:5px 10px;
+                           border-radius:8px;font-weight:700;font-size:11px;
+                           font-family:Cairo,sans-serif;white-space:nowrap;
+                           box-shadow:0 2px 8px rgba(0,0,0,0.3);">🏠 بيع</div>`,
+        className: '',
+        iconAnchor: [25, 15]
+    });
+
+    // أيقونة للإيجار
+    const rentIcon = L.divIcon({
+        html: `<div style="background:#C9A96E;color:#0a1628;padding:5px 10px;
+                           border-radius:8px;font-weight:700;font-size:11px;
+                           font-family:Cairo,sans-serif;white-space:nowrap;
+                           box-shadow:0 2px 8px rgba(0,0,0,0.3);">🏠 إيجار</div>`,
+        className: '',
+        iconAnchor: [30, 15]
+    });
+
+    let markers = [];
+
+    function addMarkers(data) {
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+
+        let saleCount = 0;
+        let rentCount = 0;
+
+        data.forEach(p => {
+            if (!p.lat || !p.lng) return;
+
+            const icon = p.listing_type === 'sale' ? saleIcon : rentIcon;
+            if (p.listing_type === 'sale') saleCount++;
+            else rentCount++;
+
+            const marker = L.marker([parseFloat(p.lat), parseFloat(p.lng)], {icon})
+                .bindPopup(`
+                    <div class="popup-card">
+                        <div class="popup-title">${p.title}</div>
+                        <div class="popup-price">${p.price} جنيه</div>
+                        <div class="popup-info">
+                            📍 ${p.city} &nbsp;|&nbsp;
+                            🛏 ${p.bedrooms} غرف &nbsp;|&nbsp;
+                            📐 ${p.area}م²
+                        </div>
+                        <a href="${p.url}" class="popup-btn">عرض التفاصيل</a>
+                    </div>
+                `, {maxWidth: 260, className: 'custom-popup'})
+                .addTo(map);
+
+            markers.push(marker);
+        });
+
+        document.getElementById('total-count').textContent = markers.length;
+        document.getElementById('sale-count').textContent = saleCount;
+        document.getElementById('rent-count').textContent = rentCount;
+    }
+
+    addMarkers(properties);
+
+    function applyFilters() {
+        const type = document.getElementById('filter-type').value;
+        const city = document.getElementById('filter-city').value;
+        const filtered = properties.filter(p => {
+            return (!type || p.listing_type === type) && (!city || p.city === city);
+        });
+        addMarkers(filtered);
+    }
+
+    function resetFilters() {
+        document.getElementById('filter-type').value = '';
+        document.getElementById('filter-city').value = '';
+        addMarkers(properties);
+    }
+
+    document.getElementById('filter-type').addEventListener('change', applyFilters);
+    document.getElementById('filter-city').addEventListener('change', applyFilters);
+
+    // Force map to render correctly
+    setTimeout(() => { map.invalidateSize(); }, 200);
+</script>
+{% endblock %}

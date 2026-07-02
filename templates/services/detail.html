@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}{{ service.name }} — BuildLink{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-4">
+
+        <!-- الصور والتفاصيل -->
+        <div class="col-md-8">
+            <div style="background:#fff;border-radius:16px;overflow:hidden;border:0.5px solid #dde3eb;">
+                {% with service.images.first as img %}
+                {% if img %}
+                <img src="{{ img.image.url }}" alt="{{ service.name }}"
+                     style="width:100%;height:380px;object-fit:cover;">
+                {% else %}
+                <div style="height:380px;background:linear-gradient(135deg,var(--navy),var(--navy-2));
+                            display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-hard-hat fa-5x" style="color:rgba(255,255,255,0.2);"></i>
+                </div>
+                {% endif %}
+                {% endwith %}
+                {% if service.images.count > 1 %}
+                <div class="d-flex gap-2 p-3" style="overflow-x:auto;">
+                    {% for img in service.images.all %}
+                    <img src="{{ img.image.url }}"
+                         style="height:80px;width:120px;object-fit:cover;border-radius:8px;flex-shrink:0;">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- التفاصيل -->
+            <div style="background:#fff;border-radius:16px;padding:28px;
+                        margin-top:16px;border:0.5px solid #dde3eb;">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h3 style="font-weight:800;color:var(--navy);">{{ service.name }}</h3>
+                    {% if service.category %}
+                    <span style="background:var(--light-bg);padding:6px 14px;border-radius:20px;
+                                 font-size:0.82rem;color:var(--navy);font-weight:600;">
+                        {{ service.category.name }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- التقييم -->
+                <div class="d-flex align-items-center gap-1 mb-3">
+                    {% for i in "12345" %}
+                    <i class="fas fa-star"
+                       style="color:{% if forloop.counter <= service.rating %}#f59e0b{% else %}#dde3eb{% endif %};"></i>
+                    {% endfor %}
+                    <span style="color:var(--gray);font-size:0.88rem;margin-right:6px;">
+                        {{ service.rating|floatformat:1 }} ({{ service.reviews_count }} تقييم)
+                    </span>
+                </div>
+
+                <p style="color:var(--gray);margin-bottom:20px;">
+                    <i class="fas fa-map-marker-alt me-1" style="color:var(--gold);"></i>
+                    {{ service.city }}
+                    {% if service.address %} — {{ service.address }}{% endif %}
+                    {% if service.experience_years %}
+                    &nbsp;|&nbsp;
+                    <i class="fas fa-briefcase me-1"></i>{{ service.experience_years }} سنة خبرة
+                    {% endif %}
+                </p>
+
+                <h5 style="font-weight:700;color:var(--navy);margin-bottom:12px;">عن الخدمة</h5>
+                <div class="gold-divider"></div>
+                <p style="color:#555;line-height:1.9;">{{ service.description }}</p>
+            </div>
+
+            <!-- التقييمات -->
+            <div style="background:#fff;border-radius:16px;padding:28px;
+                        margin-top:16px;border:0.5px solid #dde3eb;">
+                <h5 style="font-weight:700;color:var(--navy);margin-bottom:6px;">
+                    التقييمات ({{ service.reviews_count }})
+                </h5>
+                <div class="gold-divider"></div>
+
+                {% if user.is_authenticated %}
+                <div style="background:var(--light-bg);border-radius:12px;padding:20px;margin-bottom:20px;">
+                    <h6 style="font-weight:700;color:var(--navy);margin-bottom:12px;">أضف تقييمك</h6>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">التقييم</label>
+                            <select name="rating" class="form-select">
+                                <option value="5">⭐⭐⭐⭐⭐ ممتاز</option>
+                                <option value="4">⭐⭐⭐⭐ جيد جداً</option>
+                                <option value="3">⭐⭐⭐ جيد</option>
+                                <option value="2">⭐⭐ مقبول</option>
+                                <option value="1">⭐ ضعيف</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">تعليقك</label>
+                            <textarea name="comment" class="form-control" rows="3"
+                                      placeholder="اكتب تجربتك مع هذا المقاول..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-gold px-4 py-2" style="border-radius:10px;">
+                            إرسال التقييم
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+
+                {% for review in reviews %}
+                <div style="border-bottom:0.5px solid #f0f4f8;padding:16px 0;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:36px;height:36px;background:var(--navy);border-radius:50%;
+                                        display:flex;align-items:center;justify-content:center;
+                                        color:#fff;font-weight:700;font-size:0.9rem;">
+                                {{ review.user.username|first|upper }}
+                            </div>
+                            <span style="font-weight:700;color:var(--navy);">{{ review.user.username }}</span>
+                        </div>
+                        <div>
+                            {% for i in "12345" %}
+                            <i class="fas fa-star" style="font-size:0.8rem;
+                               color:{% if forloop.counter <= review.rating %}#f59e0b{% else %}#dde3eb{% endif %};"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p style="color:#555;font-size:0.9rem;margin:0;">{{ review.comment }}</p>
+                    <small style="color:var(--gray);">{{ review.created_at|date:"d/m/Y" }}</small>
+                </div>
+                {% empty %}
+                <p style="color:var(--gray);text-align:center;padding:20px 0;">
+                    لا توجد تقييمات بعد — كن أول من يقيّم!
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div style="background:#fff;border-radius:16px;padding:24px;
+                        border:0.5px solid #dde3eb;position:sticky;top:80px;">
+
+                {% if service.min_price %}
+                <div class="price-tag mb-3" style="font-size:1.5rem;">
+                    من {{ service.min_price|floatformat:0 }}
+                    {% if service.max_price %}
+                    — {{ service.max_price|floatformat:0 }}
+                    {% endif %}
+                    <small>جنيه</small>
+                </div>
+                {% endif %}
+
+                <hr style="border-color:#f0f4f8;">
+                <h6 style="font-weight:700;color:var(--navy);margin-bottom:14px;">تواصل معنا</h6>
+
+                <a href="tel:{{ service.phone }}" class="btn btn-primary w-100 mb-2 py-2">
+                    <i class="fas fa-phone me-2"></i>{{ service.phone }}
+                </a>
+
+                {% if service.whatsapp %}
+                <a href="https://wa.me/2{{ service.whatsapp }}" target="_blank"
+                   class="w-100 mb-2 py-2 d-flex align-items-center justify-content-center"
+                   style="background:#25d366;color:#fff;border-radius:10px;
+                          font-weight:700;text-decoration:none;">
+                    <i class="fab fa-whatsapp me-2 fa-lg"></i>واتساب
+                </a>
+                {% endif %}
+
+                {% if service.email %}
+                <a href="mailto:{{ service.email }}"
+                   class="w-100 py-2 d-flex align-items-center justify-content-center"
+                   style="background:var(--light-bg);color:var(--navy);border-radius:10px;
+                          font-weight:700;text-decoration:none;border:0.5px solid #dde3eb;">
+                    <i class="fas fa-envelope me-2"></i>إرسال بريد
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
