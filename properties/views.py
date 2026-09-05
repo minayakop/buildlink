@@ -1,7 +1,15 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
-from .models import Property, PropertyType, City, District
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from decouple import config
+import json
+from .models import Property, PropertyType, City, District, PropertyReview
+from .forms import PropertyForm
+
 
 def home(request):
     featured    = Property.objects.filter(is_featured=True, status='available')[:6]
@@ -47,7 +55,6 @@ def property_list(request):
     if bedrooms:
         properties = properties.filter(bedrooms=bedrooms)
     if search:
-        from django.db.models import Q
         properties = properties.filter(
             Q(title__icontains=search) |
             Q(description__icontains=search) |
@@ -73,64 +80,6 @@ def property_detail(request, pk):
     prop.views_count += 1
     prop.save()
 
-    similar = Property.objects.filter(
-        city=prop.city,
-        listing_type=prop.listing_type,
-        status='available'
-    ).exclude(pk=pk)[:4]
-
-    context = {
-        'property'  : prop,
-        'similar'   : similar,
-    }
-    return render(request, 'properties/detail.html', context)
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .forms import PropertyForm
-
-@login_required
-def property_add(request):
-    if request.method == 'POST':
-        form = PropertyForm(request.POST, request.FILES)
-        if form.is_valid():
-            prop = form.save(commit=False)
-            prop.owner = request.user
-            prop.status = 'pending'
-            prop.save()
-
-            # حفظ الصور
-            images = request.FILES.getlist('images')
-            for i, image in enumerate(images):
-                PropertyImage.objects.create(
-                    property=prop,
-                    image=image,
-                    is_main=(i == 0)
-                )
-
-            messages.success(request, 'تم إضافة العقار بنجاح! سيتم مراجعته قريباً.')
-            return redirect('properties:detail', pk=prop.pk)
-    else:
-        form = PropertyForm()
-
-    return render(request, 'properties/add.html', {'form': form})
-def property_map(request):
-    properties = Property.objects.filter(status='available')
-    cities = City.objects.all()
-    context = {
-        'properties': properties,
-        'cities': cities,
-    }
-    return render(request, 'properties/map.html', context)
-from .models import Property, PropertyType, City, District, PropertyReview
-
-def property_detail(request, pk):
-    prop = get_object_or_404(Property, pk=pk)
-
-    # زيادة عداد المشاهدات
-    prop.views_count += 1
-    prop.save()
-
-    # إضافة تقييم
     if request.method == 'POST' and request.user.is_authenticated:
         rating  = int(request.POST.get('rating', 5))
         comment = request.POST.get('comment', '').strip()
@@ -141,7 +90,6 @@ def property_detail(request, pk):
                 user=request.user,
                 defaults={'rating': rating, 'comment': comment}
             )
-            # تحديث متوسط التقييم
             reviews = prop.reviews.all()
             if reviews.exists():
                 prop.avg_rating     = sum(r.rating for r in reviews) / reviews.count()
@@ -157,7 +105,6 @@ def property_detail(request, pk):
         status='available'
     ).exclude(pk=pk)[:4]
 
-    # هل المستخدم قيّم من قبل؟
     user_review = None
     if request.user.is_authenticated:
         user_review = prop.reviews.filter(user=request.user).first()
@@ -169,11 +116,50 @@ def property_detail(request, pk):
         'user_review': user_review,
     }
     return render(request, 'properties/detail.html', context)
+
+
+@login_required
+def property_add(request):
+    if request.method == 'POST':
+        form = PropertyForm(request.POST, request.FILES)
+        if form.is_valid():
+            prop = form.save(commit=False)
+            prop.owner  = request.user
+            prop.status = 'available'  # ← ينشر مباشرة بدون مراجعة
+            prop.save()
+
+            images = request.FILES.getlist('images')
+            for i, image in enumerate(images):
+                from .models import PropertyImage
+                PropertyImage.objects.create(
+                    property=prop,
+                    image=image,
+                    is_main=(i == 0)
+                )
+
+            messages.success(request, '🎉 تم نشر إعلانك بنجاح! يظهر الآن للمشترين.')
+            return redirect('properties:detail', pk=prop.pk)
+        else:
+            messages.error(request, 'في خطأ في البيانات — تأكد من ملء كل الحقول المطلوبة.')
+    else:
+        form = PropertyForm()
+
+    return render(request, 'properties/add.html', {'form': form})
+
+
+def property_map(request):
+    properties = Property.objects.filter(status='available')
+    cities = City.objects.all()
+    context = {
+        'properties': properties,
+        'cities': cities,
+    }
+    return render(request, 'properties/map.html', context)
+
+
 def ai_estimator(request):
     return render(request, 'properties/ai_estimator.html')
-import json
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+
 
 @csrf_exempt
 def ai_chat(request):
@@ -181,7 +167,7 @@ def ai_chat(request):
         try:
             import anthropic
             data = json.loads(request.body)
-            messages = data.get('messages', [])
+            messages_data = data.get('messages', [])
 
             client = anthropic.Anthropic(
                 api_key=config('ANTHROPIC_API_KEY', default='')
@@ -195,9 +181,8 @@ def ai_chat(request):
 - تقدير تكلفة التشطيب والبناء بالجنيه المصري
 - حساب كميات مواد البناء
 - الإجابة على الأسئلة الهندسية
-- اقتراح أفضل الخيارات حسب الميزانية
 قواعد: أجب بالعربية دائماً، استخدم الجنيه المصري، قدم أرقاماً تقريبية واضحة.""",
-                messages=messages
+                messages=messages_data
             )
 
             return JsonResponse({

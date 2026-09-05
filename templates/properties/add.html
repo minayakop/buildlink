@@ -10,7 +10,16 @@
             <div class="text-center mb-4">
                 <h2 class="section-title">أضف <span>عقارك</span></h2>
                 <div class="gold-divider mx-auto"></div>
-                <p style="color:var(--gray);">أضف بيانات عقارك وسيظهر للمشترين بعد المراجعة</p>
+                <p style="color:var(--gray);">أضف بيانات عقارك وسيظهر للمشترين فوراً</p>
+            </div>
+
+            <!-- رسالة النشر الفوري -->
+            <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);
+                        border-radius:12px;padding:16px;margin-bottom:24px;text-align:center;">
+                <i class="fas fa-bolt me-2" style="color:#22c55e;"></i>
+                <span style="color:#166534;font-size:0.92rem;font-weight:600;">
+                    إعلانك سيظهر للمشترين <strong>فوراً</strong> بعد الإضافة
+                </span>
             </div>
 
             <div style="background:#fff;border-radius:20px;padding:36px;border:0.5px solid #dde3eb;">
@@ -26,6 +35,9 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">عنوان الإعلان *</label>
                             {{ form.title }}
+                            {% if form.title.errors %}
+                            <div style="color:#ef4444;font-size:0.82rem;">{{ form.title.errors }}</div>
+                            {% endif %}
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -163,7 +175,9 @@
                         </h6>
                         <div style="border:2px dashed #dde3eb;border-radius:12px;padding:30px;text-align:center;background:#fff;">
                             <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color:var(--gold);"></i>
-                            <p style="color:var(--gray);margin-bottom:12px;">اختر صور العقار (يمكن اختيار أكثر من صورة)</p>
+                            <p style="color:var(--gray);margin-bottom:12px;">
+                                اختر صور العقار (يمكن اختيار أكثر من صورة)
+                            </p>
                             <input type="file" name="images" multiple accept="image/*"
                                    class="form-control" style="max-width:300px;margin:0 auto;">
                         </div>
@@ -173,29 +187,27 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold">وصف العقار *</label>
                         {{ form.description }}
+                        {% if form.description.errors %}
+                        <div style="color:#ef4444;font-size:0.82rem;">{{ form.description.errors }}</div>
+                        {% endif %}
                     </div>
 
                     {{ form.latitude }}
                     {{ form.longitude }}
 
-                    <button type="submit" class="btn-gold w-100 py-3" style="font-size:1.1rem;border-radius:12px;">
-                        <i class="fas fa-plus-circle me-2"></i>نشر الإعلان
+                    <!-- زر النشر -->
+                    <button type="submit" class="btn-gold w-100 py-3"
+                            style="font-size:1.1rem;border-radius:12px;">
+                        <i class="fas fa-paper-plane me-2"></i>نشر الإعلان فوراً
                     </button>
+
+                    <p style="text-align:center;color:var(--gray);font-size:0.82rem;margin-top:12px;">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        إعلانك محمي ويمكنك حذفه في أي وقت من حسابك
+                    </p>
                 </form>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
-<!-- في card.html أضف بعد الـ badge -->
-{% if property.status == 'pending' %}
-<div style="background:#fff3cd;color:#856404;padding:6px 12px;
-            font-size:0.82rem;text-align:center;border-top:1px solid #ffeeba;">
-    <i class="fas fa-clock me-1"></i>قيد المراجعة
-</div>
-{% elif property.status == 'available' %}
-<div style="background:#d4edda;color:#155724;padding:6px 12px;
-            font-size:0.82rem;text-align:center;border-top:1px solid #c3e6cb;">
-    <i class="fas fa-check me-1"></i>معروض للبيع
-</div>
-{% endif %}
