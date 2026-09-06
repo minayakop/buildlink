@@ -7,7 +7,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-rq^11u6hzf)2e#y^bm3q*
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['mina2.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
