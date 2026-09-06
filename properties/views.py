@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from decouple import config
 import json
-from .models import Property, PropertyType, City, District, PropertyReview
+from .models import Property, PropertyType, City, District, PropertyReview, PropertyImage
 from .forms import PropertyForm
 
 
@@ -125,12 +125,11 @@ def property_add(request):
         if form.is_valid():
             prop = form.save(commit=False)
             prop.owner  = request.user
-            prop.status = 'available'  # ← ينشر مباشرة بدون مراجعة
+            prop.status = 'available'
             prop.save()
 
             images = request.FILES.getlist('images')
             for i, image in enumerate(images):
-                from .models import PropertyImage
                 PropertyImage.objects.create(
                     property=prop,
                     image=image,
