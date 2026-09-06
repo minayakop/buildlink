@@ -1,3 +1,6 @@
+import json
+from decouple import config
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
@@ -5,26 +8,32 @@ from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from decouple import config
-import json
-from .models import Property, PropertyType, City, District, PropertyReview, PropertyImage
+
+# استيراد الموديلات والنماذج مرة واحدة فقط وبشكل واضح
+from .models import (
+    Property,
+    PropertyType,
+    City,
+    District,
+    PropertyReview,
+    PropertyImage
+)
 from .forms import PropertyForm
-from .models import Property, PropertyImage
 
 
 def home(request):
-    featured    = Property.objects.filter(is_featured=True, status='available')[:6]
-    latest      = Property.objects.filter(status='available')[:8]
-    cities      = City.objects.all()
-    for_sale    = Property.objects.filter(listing_type='sale', status='available').count()
-    for_rent    = Property.objects.filter(listing_type='rent', status='available').count()
+    featured = Property.objects.filter(is_featured=True, status='available')[:6]
+    latest = Property.objects.filter(status='available')[:8]
+    cities = City.objects.all()
+    for_sale = Property.objects.filter(listing_type='sale', status='available').count()
+    for_rent = Property.objects.filter(listing_type='rent', status='available').count()
 
     context = {
-        'featured'  : featured,
-        'latest'    : latest,
-        'cities'    : cities,
-        'for_sale'  : for_sale,
-        'for_rent'  : for_rent,
+        'featured': featured,
+        'latest': latest,
+        'cities': cities,
+        'for_sale': for_sale,
+        'for_rent': for_rent,
     }
     return render(request, 'properties/home.html', context)
 
@@ -32,14 +41,14 @@ def home(request):
 def property_list(request):
     properties = Property.objects.filter(status='available')
 
-    listing_type    = request.GET.get('listing_type')
-    property_type   = request.GET.get('property_type')
-    city_id         = request.GET.get('city')
-    min_price       = request.GET.get('min_price')
-    max_price       = request.GET.get('max_price')
-    min_area        = request.GET.get('min_area')
-    bedrooms        = request.GET.get('bedrooms')
-    search          = request.GET.get('search')
+    listing_type = request.GET.get('listing_type')
+    property_type = request.GET.get('property_type')
+    city_id = request.GET.get('city')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    min_area = request.GET.get('min_area')
+    bedrooms = request.GET.get('bedrooms')
+    search = request.GET.get('search')
 
     if listing_type:
         properties = properties.filter(listing_type=listing_type)
@@ -62,15 +71,15 @@ def property_list(request):
             Q(address__icontains=search)
         )
 
-    paginator   = Paginator(properties, 12)
-    page        = request.GET.get('page')
-    properties  = paginator.get_page(page)
+    paginator = Paginator(properties, 12)
+    page = request.GET.get('page')
+    properties_page = paginator.get_page(page)
 
     context = {
-        'properties'    : properties,
-        'cities'        : City.objects.all(),
+        'properties': properties_page,
+        'cities': City.objects.all(),
         'property_types': PropertyType.objects.all(),
-        'total'         : paginator.count,
+        'total': paginator.count,
     }
     return render(request, 'properties/list.html', context)
 
@@ -79,10 +88,10 @@ def property_detail(request, pk):
     prop = get_object_or_404(Property, pk=pk)
 
     prop.views_count += 1
-    prop.save()
+    prop.save(update_fields=['views_count'])
 
     if request.method == 'POST' and request.user.is_authenticated:
-        rating  = int(request.POST.get('rating', 5))
+        rating = int(request.POST.get('rating', 5))
         comment = request.POST.get('comment', '').strip()
 
         if comment:
@@ -93,9 +102,9 @@ def property_detail(request, pk):
             )
             reviews = prop.reviews.all()
             if reviews.exists():
-                prop.avg_rating     = sum(r.rating for r in reviews) / reviews.count()
-                prop.reviews_count  = reviews.count()
-                prop.save()
+                prop.avg_rating = sum(r.rating for r in reviews) / reviews.count()
+                prop.reviews_count = reviews.count()
+                prop.save(update_fields=['avg_rating', 'reviews_count'])
             messages.success(request, 'تم إضافة تقييمك بنجاح! شكراً لك.')
             return redirect('properties:detail', pk=pk)
 
@@ -111,9 +120,9 @@ def property_detail(request, pk):
         user_review = prop.reviews.filter(user=request.user).first()
 
     context = {
-        'property'   : prop,
-        'similar'    : similar,
-        'reviews'    : reviews,
+        'property': prop,
+        'similar': similar,
+        'reviews': reviews,
         'user_review': user_review,
     }
     return render(request, 'properties/detail.html', context)
@@ -125,7 +134,7 @@ def property_add(request):
         form = PropertyForm(request.POST, request.FILES)
         if form.is_valid():
             prop = form.save(commit=False)
-            prop.owner  = request.user
+            prop.owner = request.user
             prop.status = 'available'
             prop.save()
 
@@ -173,8 +182,9 @@ def ai_chat(request):
                 api_key=config('ANTHROPIC_API_KEY', default='')
             )
 
+            # تعديل اسم الموديل إلى الإصدار الرسمي المستقر
             response = client.messages.create(
-                model="claude-sonnet-4-6",
+                model="claude-3-5-sonnet-20241022",
                 max_tokens=1000,
                 system="""أنت مساعد ذكي متخصص في العقارات والبناء والتشطيبات في مصر.
 مهمتك مساعدة المستخدمين في:
