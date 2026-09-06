@@ -9,6 +9,7 @@ from decouple import config
 import json
 from .models import Property, PropertyType, City, District, PropertyReview, PropertyImage
 from .forms import PropertyForm
+from .models import Property, PropertyImage
 
 
 def home(request):
