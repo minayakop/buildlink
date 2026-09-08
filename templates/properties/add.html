@@ -77,23 +77,6 @@
                     <div style="background:var(--light-bg);border-radius:12px;padding:20px;margin-bottom:24px;">
                         <h6 style="font-weight:700;color:var(--navy);margin-bottom:16px;">
                             <i class="fas fa-ruler-combined me-2" style="color:var(--gold);"></i>
-                            <!-- تواصل -->
-<div style="background:var(--light-bg);border-radius:12px;padding:20px;margin-bottom:24px;">
-    <h6 style="font-weight:700;color:var(--navy);margin-bottom:16px;">
-        <i class="fas fa-phone me-2" style="color:var(--gold);"></i>
-        بيانات التواصل
-    </h6>
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label fw-bold">رقم الهاتف *</label>
-            {{ form.phone }}
-        </div>
-        <div class="col-md-6">
-            <label class="form-label fw-bold">واتساب</label>
-            {{ form.whatsapp }}
-        </div>
-    </div>
-</div>
                             التفاصيل
                         </h6>
                         <div class="row g-3">
@@ -120,6 +103,30 @@
                             <div class="col-12">
                                 <label class="form-label fw-bold">التشطيب</label>
                                 {{ form.finishing }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- بيانات التواصل -->
+                    <div style="background:var(--light-bg);border-radius:12px;padding:20px;margin-bottom:24px;">
+                        <h6 style="font-weight:700;color:var(--navy);margin-bottom:16px;">
+                            <i class="fas fa-phone me-2" style="color:var(--gold);"></i>
+                            بيانات التواصل
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-phone me-1" style="color:var(--navy);"></i>
+                                    رقم الهاتف
+                                </label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fab fa-whatsapp me-1" style="color:#25d366;"></i>
+                                    واتساب
+                                </label>
+                                {{ form.whatsapp }}
                             </div>
                         </div>
                     </div>
