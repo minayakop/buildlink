@@ -60,6 +60,30 @@ class PropertyForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '01000000000'
             }),
+            'has_garage': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'has_garden': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'has_pool': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'has_elevator': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'has_security': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user and not self.initial.get('phone'):
+            user_phone = getattr(user, 'phone', '') or getattr(getattr(user, 'profile', None), 'phone', '')
+            if user_phone:
+                self.fields['phone'].initial = user_phone
+                self.fields['whatsapp'].initial = user_phone
+
+
+class PropertyImageForm(forms.ModelForm):
+    class Meta:
+        model = PropertyImage
+        fields = ['image', 'is_main']
+        widgets = {
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'is_main': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

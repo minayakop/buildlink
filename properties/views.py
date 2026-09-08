@@ -5,11 +5,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, F
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-# استيراد الموديلات والنماذج مرة واحدة فقط وبشكل واضح
 from .models import (
     Property,
     PropertyType,
@@ -22,8 +21,8 @@ from .forms import PropertyForm
 
 
 def home(request):
-    featured = Property.objects.filter(is_featured=True, status='available')[:6]
-    latest = Property.objects.filter(status='available')[:8]
+    featured = Property.objects.filter(is_featured=True, status='available').select_related('city', 'property_type').prefetch_related('images')[:6]
+    latest = Property.objects.filter(status='available').select_related('city', 'property_type').prefetch_related('images')[:8]
     cities = City.objects.all()
     for_sale = Property.objects.filter(listing_type='sale', status='available').count()
     for_rent = Property.objects.filter(listing_type='rent', status='available').count()
@@ -39,7 +38,7 @@ def home(request):
 
 
 def property_list(request):
-    properties = Property.objects.filter(status='available')
+    properties = Property.objects.filter(status='available').select_related('city', 'district', 'property_type').prefetch_related('images')
 
     listing_type = request.GET.get('listing_type')
     property_type = request.GET.get('property_type')
@@ -85,10 +84,13 @@ def property_list(request):
 
 
 def property_detail(request, pk):
-    prop = get_object_or_404(Property, pk=pk)
+    prop = get_object_or_404(
+        Property.objects.select_related('city', 'district', 'property_type', 'owner'),
+        pk=pk
+    )
 
-    prop.views_count += 1
-    prop.save(update_fields=['views_count'])
+    # تحديث عدد المشاهدات بكفاءة
+    Property.objects.filter(pk=pk).update(views_count=F('views_count') + 1)
 
     if request.method == 'POST' and request.user.is_authenticated:
         rating = int(request.POST.get('rating', 5))
@@ -108,12 +110,12 @@ def property_detail(request, pk):
             messages.success(request, 'تم إضافة تقييمك بنجاح! شكراً لك.')
             return redirect('properties:detail', pk=pk)
 
-    reviews = prop.reviews.all().order_by('-created_at')
+    reviews = prop.reviews.select_related('user').all().order_by('-created_at')
     similar = Property.objects.filter(
         city=prop.city,
         listing_type=prop.listing_type,
         status='available'
-    ).exclude(pk=pk)[:4]
+    ).exclude(pk=pk).prefetch_related('images')[:4]
 
     user_review = None
     if request.user.is_authenticated:
@@ -149,7 +151,7 @@ def property_add(request):
             messages.success(request, '🎉 تم نشر إعلانك بنجاح! يظهر الآن للمشترين.')
             return redirect('properties:detail', pk=prop.pk)
         else:
-            messages.error(request, 'في خطأ في البيانات — تأكد من ملء كل الحقول المطلوبة.')
+            messages.error(request, 'هناك خطأ في البيانات — تأكد من ملء الحقول المطلوبة بشكل صحيح.')
     else:
         form = PropertyForm()
 
@@ -157,7 +159,7 @@ def property_add(request):
 
 
 def property_map(request):
-    properties = Property.objects.filter(status='available')
+    properties = Property.objects.filter(status='available').select_related('city', 'property_type')
     cities = City.objects.all()
     context = {
         'properties': properties,
@@ -182,7 +184,6 @@ def ai_chat(request):
                 api_key=config('ANTHROPIC_API_KEY', default='')
             )
 
-            # تعديل اسم الموديل إلى الإصدار الرسمي المستقر
             response = client.messages.create(
                 model="claude-3-5-sonnet-20241022",
                 max_tokens=1000,
