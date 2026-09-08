@@ -90,6 +90,10 @@ class Property(models.Model):
     has_elevator    = models.BooleanField(default=False, verbose_name="أسانسير")
     has_security    = models.BooleanField(default=False, verbose_name="أمن وحراسة")
 
+    # ===== بيانات التواصل =====
+    phone           = models.CharField(max_length=20, blank=True, verbose_name="رقم الهاتف")
+    whatsapp        = models.CharField(max_length=20, blank=True, verbose_name="واتساب")
+
     # المالك والتوقيت
     owner           = models.ForeignKey(User, on_delete=models.CASCADE, related_name='properties', verbose_name="المالك")
     is_featured     = models.BooleanField(default=False, verbose_name="إعلان مميز")

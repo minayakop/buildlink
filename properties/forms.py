@@ -10,6 +10,7 @@ class PropertyForm(forms.ModelForm):
             'city', 'district', 'address',
             'price', 'area', 'bedrooms', 'bathrooms', 'floor', 'finishing',
             'has_garage', 'has_garden', 'has_pool', 'has_elevator', 'has_security',
+            'phone', 'whatsapp',
             'latitude', 'longitude',
         ]
         widgets = {
@@ -51,6 +52,14 @@ class PropertyForm(forms.ModelForm):
                 'placeholder': 'رقم الدور'
             }),
             'finishing': forms.Select(attrs={'class': 'form-select'}),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '01000000000'
+            }),
+            'whatsapp': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '01000000000'
+            }),
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }
