@@ -72,6 +72,18 @@ class PropertyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
+        # تحديد التسمية الافتراضية للخيارات المنسدلة لضمان ظهور التلميح للعميل
+        if 'property_type' in self.fields:
+            self.fields['property_type'].empty_label = "اختر نوع العقار"
+        if 'city' in self.fields:
+            self.fields['city'].empty_label = "اختر المدينة"
+        if 'district' in self.fields:
+            self.fields['district'].empty_label = "اختر الحي"
+        if 'finishing' in self.fields:
+            self.fields['finishing'].empty_label = "اختر نوع التشطيب"
+
+        # ملء بيانات التواصل تلقائياً إن وجدت للمستخدم
         if user and not self.initial.get('phone'):
             user_phone = getattr(user, 'phone', '') or getattr(getattr(user, 'profile', None), 'phone', '')
             if user_phone:

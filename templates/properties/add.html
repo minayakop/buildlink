@@ -14,8 +14,7 @@
             </div>
 
             <!-- رسالة النشر الفوري -->
-            <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);
-                        border-radius:12px;padding:16px;margin-bottom:24px;text-align:center;">
+            <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:16px;margin-bottom:24px;text-align:center;">
                 <i class="fas fa-bolt me-2" style="color:#22c55e;"></i>
                 <span style="color:#166534;font-size:0.92rem;font-weight:600;">
                     إعلانك سيظهر للمشترين <strong>فوراً</strong> بعد الإضافة
@@ -23,8 +22,14 @@
             </div>
 
             <div style="background:#fff;border-radius:20px;padding:36px;border:0.5px solid #dde3eb;">
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger rounded-3 mb-4">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
 
                     <!-- المعلومات الأساسية -->
                     <div style="background:var(--light-bg);border-radius:12px;padding:20px;margin-bottom:24px;">
@@ -36,17 +41,23 @@
                             <label class="form-label fw-bold">عنوان الإعلان *</label>
                             {{ form.title }}
                             {% if form.title.errors %}
-                            <div style="color:#ef4444;font-size:0.82rem;">{{ form.title.errors }}</div>
+                            <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.title.errors|strip-tags }}</div>
                             {% endif %}
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">نوع الإعلان *</label>
                                 {{ form.listing_type }}
+                                {% if form.listing_type.errors %}
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.listing_type.errors|strip-tags }}</div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">نوع العقار *</label>
                                 {{ form.property_type }}
+                                {% if form.property_type.errors %}
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.property_type.errors|strip-tags }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -61,6 +72,9 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">المدينة *</label>
                                 {{ form.city }}
+                                {% if form.city.errors %}
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.city.errors|strip-tags }}</div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">الحي</label>
@@ -83,10 +97,16 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">السعر (جنيه) *</label>
                                 {{ form.price }}
+                                {% if form.price.errors %}
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.price.errors|strip-tags }}</div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">المساحة (م²) *</label>
                                 {{ form.area }}
+                                {% if form.area.errors %}
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.area.errors|strip-tags }}</div>
+                                {% endif %}
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">غرف النوم</label>
@@ -140,9 +160,9 @@
                         <div class="row g-2">
                             <div class="col-6 col-md-4">
                                 <div style="background:#fff;border-radius:10px;padding:12px;border:0.5px solid #dde3eb;">
-                                    <div class="form-check">
+                                    <div class="form-check m-0">
                                         {{ form.has_garage }}
-                                        <label class="form-check-label me-2">
+                                        <label class="form-check-label ms-2" for="{{ form.has_garage.id_for_label }}">
                                             <i class="fas fa-car me-1" style="color:var(--gold);"></i>جراج
                                         </label>
                                     </div>
@@ -150,9 +170,9 @@
                             </div>
                             <div class="col-6 col-md-4">
                                 <div style="background:#fff;border-radius:10px;padding:12px;border:0.5px solid #dde3eb;">
-                                    <div class="form-check">
+                                    <div class="form-check m-0">
                                         {{ form.has_garden }}
-                                        <label class="form-check-label me-2">
+                                        <label class="form-check-label ms-2" for="{{ form.has_garden.id_for_label }}">
                                             <i class="fas fa-tree me-1" style="color:var(--gold);"></i>حديقة
                                         </label>
                                     </div>
@@ -160,9 +180,9 @@
                             </div>
                             <div class="col-6 col-md-4">
                                 <div style="background:#fff;border-radius:10px;padding:12px;border:0.5px solid #dde3eb;">
-                                    <div class="form-check">
+                                    <div class="form-check m-0">
                                         {{ form.has_pool }}
-                                        <label class="form-check-label me-2">
+                                        <label class="form-check-label ms-2" for="{{ form.has_pool.id_for_label }}">
                                             <i class="fas fa-swimming-pool me-1" style="color:var(--gold);"></i>حمام سباحة
                                         </label>
                                     </div>
@@ -170,9 +190,9 @@
                             </div>
                             <div class="col-6 col-md-4">
                                 <div style="background:#fff;border-radius:10px;padding:12px;border:0.5px solid #dde3eb;">
-                                    <div class="form-check">
+                                    <div class="form-check m-0">
                                         {{ form.has_elevator }}
-                                        <label class="form-check-label me-2">
+                                        <label class="form-check-label ms-2" for="{{ form.has_elevator.id_for_label }}">
                                             <i class="fas fa-elevator me-1" style="color:var(--gold);"></i>أسانسير
                                         </label>
                                     </div>
@@ -180,9 +200,9 @@
                             </div>
                             <div class="col-6 col-md-4">
                                 <div style="background:#fff;border-radius:10px;padding:12px;border:0.5px solid #dde3eb;">
-                                    <div class="form-check">
+                                    <div class="form-check m-0">
                                         {{ form.has_security }}
-                                        <label class="form-check-label me-2">
+                                        <label class="form-check-label ms-2" for="{{ form.has_security.id_for_label }}">
                                             <i class="fas fa-shield-alt me-1" style="color:var(--gold);"></i>أمن وحراسة
                                         </label>
                                     </div>
@@ -202,8 +222,9 @@
                             <p style="color:var(--gray);margin-bottom:12px;">
                                 اختر صور العقار (يمكن اختيار أكثر من صورة)
                             </p>
-                            <input type="file" name="images" multiple accept="image/*"
-                                   class="form-control" style="max-width:300px;margin:0 auto;">
+                            <input type="file" name="images" id="imageInput" multiple accept="image/*" class="form-control" style="max-width:300px;margin:0 auto;">
+                            <!-- حاوية معاينة الصور -->
+                            <div id="imagePreview" class="d-flex flex-wrap gap-2 justify-content-center mt-3"></div>
                         </div>
                     </div>
 
@@ -212,7 +233,7 @@
                         <label class="form-label fw-bold">وصف العقار *</label>
                         {{ form.description }}
                         {% if form.description.errors %}
-                        <div style="color:#ef4444;font-size:0.82rem;">{{ form.description.errors }}</div>
+                        <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.description.errors|strip-tags }}</div>
                         {% endif %}
                     </div>
 
@@ -220,8 +241,7 @@
                     {{ form.longitude }}
 
                     <!-- زر النشر -->
-                    <button type="submit" class="btn-gold w-100 py-3"
-                            style="font-size:1.1rem;border-radius:12px;">
+                    <button type="submit" class="btn-gold w-100 py-3" style="font-size:1.1rem;border-radius:12px;">
                         <i class="fas fa-paper-plane me-2"></i>نشر الإعلان فوراً
                     </button>
 
@@ -234,4 +254,50 @@
         </div>
     </div>
 </div>
+
+<!-- JavaScript للتحسينات السريعة -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // 1. إعطاء كلاسات Bootstrap للحقول القادمة من Django تلقائياً
+    const inputs = document.querySelectorAll("input:not([type='checkbox']):not([type='file']), select, textarea");
+    inputs.forEach(input => {
+        if (!input.classList.contains("form-control") && !input.classList.contains("form-select")) {
+            if (input.tagName === "SELECT") {
+                input.classList.add("form-select");
+            } else {
+                input.classList.add("form-control");
+            }
+        }
+    });
+
+    const checkboxes = document.querySelectorAll("input[type='checkbox']");
+    checkboxes.forEach(cb => cb.classList.add("form-check-input"));
+
+    // 2. معاينة الصور المرفوعة
+    const imageInput = document.getElementById("imageInput");
+    const imagePreview = document.getElementById("imagePreview");
+
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener("change", function () {
+            imagePreview.innerHTML = "";
+            Array.from(this.files).forEach(file => {
+                if (file.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement("img");
+                        img.src = e.target.result;
+                        img.style.width = "80px";
+                        img.style.height = "80px";
+                        img.style.objectFit = "cover";
+                        img.style.borderRadius = "8px";
+                        img.style.border = "1px solid #dde3eb";
+                        imagePreview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    }
+});
+</script>
 {% endblock %}
