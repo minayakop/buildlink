@@ -9,9 +9,8 @@ class PropertyForm(forms.ModelForm):
             'title', 'description', 'listing_type', 'property_type',
             'city', 'district', 'address',
             'price', 'area', 'bedrooms', 'bathrooms', 'floor', 'finishing',
-            'has_garage', 'has_garden', 'has_pool', 'has_elevator', 'has_security',
             'phone', 'whatsapp',
-            'has_garage', 'has_garden', 'has_pool', 'has_elevator', 'has_security'
+            'has_garage', 'has_garden', 'has_pool', 'has_elevator', 'has_security',
             'latitude', 'longitude',
         ]
         widgets = {
@@ -88,8 +87,10 @@ class PropertyForm(forms.ModelForm):
         if user and not self.initial.get('phone'):
             user_phone = getattr(user, 'phone', '') or getattr(getattr(user, 'profile', None), 'phone', '')
             if user_phone:
-                self.fields['phone'].initial = user_phone
-                self.fields['whatsapp'].initial = user_phone
+                if 'phone' in self.fields:
+                    self.fields['phone'].initial = user_phone
+                if 'whatsapp' in self.fields:
+                    self.fields['whatsapp'].initial = user_phone
 
 
 class PropertyImageForm(forms.ModelForm):
