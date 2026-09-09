@@ -41,7 +41,7 @@
                             <label class="form-label fw-bold">عنوان الإعلان *</label>
                             {{ form.title }}
                             {% if form.title.errors %}
-                            <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.title.errors|strip-tags }}</div>
+                            <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.title.errors|striptags }}</div>
                             {% endif %}
                         </div>
                         <div class="row g-3">
@@ -49,14 +49,14 @@
                                 <label class="form-label fw-bold">نوع الإعلان *</label>
                                 {{ form.listing_type }}
                                 {% if form.listing_type.errors %}
-                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.listing_type.errors|strip-tags }}</div>
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.listing_type.errors|striptags }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">نوع العقار *</label>
                                 {{ form.property_type }}
                                 {% if form.property_type.errors %}
-                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.property_type.errors|strip-tags }}</div>
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.property_type.errors|striptags }}</div>
                                 {% endif %}
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                                 <label class="form-label fw-bold">المدينة *</label>
                                 {{ form.city }}
                                 {% if form.city.errors %}
-                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.city.errors|strip-tags }}</div>
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.city.errors|striptags }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
@@ -98,14 +98,14 @@
                                 <label class="form-label fw-bold">السعر (جنيه) *</label>
                                 {{ form.price }}
                                 {% if form.price.errors %}
-                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.price.errors|strip-tags }}</div>
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.price.errors|striptags }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">المساحة (م²) *</label>
                                 {{ form.area }}
                                 {% if form.area.errors %}
-                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.area.errors|strip-tags }}</div>
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.area.errors|striptags }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-4">
@@ -233,7 +233,7 @@
                         <label class="form-label fw-bold">وصف العقار *</label>
                         {{ form.description }}
                         {% if form.description.errors %}
-                        <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.description.errors|strip-tags }}</div>
+                        <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.description.errors|striptags }}</div>
                         {% endif %}
                     </div>
 
