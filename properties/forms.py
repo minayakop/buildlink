@@ -11,6 +11,7 @@ class PropertyForm(forms.ModelForm):
             'price', 'area', 'bedrooms', 'bathrooms', 'floor', 'finishing',
             'has_garage', 'has_garden', 'has_pool', 'has_elevator', 'has_security',
             'phone', 'whatsapp',
+            'has_garage', 'has_garden', 'has_pool', 'has_elevator', 'has_security'
             'latitude', 'longitude',
         ]
         widgets = {
