@@ -140,6 +140,9 @@
                                     رقم الهاتف
                                 </label>
                                 {{ form.phone }}
+                                {% if form.phone.errors %}
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.phone.errors|striptags }}</div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
@@ -147,6 +150,9 @@
                                     واتساب
                                 </label>
                                 {{ form.whatsapp }}
+                                {% if form.whatsapp.errors %}
+                                <div class="text-danger mt-1" style="font-size:0.82rem;">{{ form.whatsapp.errors|striptags }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
