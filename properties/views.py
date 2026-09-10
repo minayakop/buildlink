@@ -146,19 +146,6 @@ def property_add(request):
                     property=prop,
                     image=image,
                     is_main=(i == 0)
-                    images = request.FILES.getlist('images')
-            for img in images:
-                PropertyImage.objects.create(property=property_obj, image=img)
-                
-            messages.success(request, 'تم تحديث بيانات العقار بنجاح!')
-            return redirect('properties:detail', pk=property_obj.pk)
-    else:
-        form = PropertyForm(instance=property_obj)
-
-    return render(request, 'properties/form.html', {
-        'form': form,
-        'property': property_obj,
-        'is_update': True
                 )
 
             messages.success(request, '🎉 تم نشر إعلانك بنجاح! يظهر الآن للمشترين.')
@@ -169,6 +156,32 @@ def property_add(request):
         form = PropertyForm()
 
     return render(request, 'properties/add.html', {'form': form})
+
+
+@login_required
+def property_update(request, pk):
+    property_obj = get_object_or_404(Property, pk=pk, owner=request.user)
+
+    if request.method == 'POST':
+        form = PropertyForm(request.POST, request.FILES, instance=property_obj)
+        if form.is_valid():
+            form.save()
+
+            images = request.FILES.getlist('images')
+            for img in images:
+                PropertyImage.objects.create(property=property_obj, image=img)
+
+            messages.success(request, 'تم تحديث بيانات العقار بنجاح!')
+            return redirect('properties:detail', pk=property_obj.pk)
+    else:
+        form = PropertyForm(instance=property_obj)
+
+    context = {
+        'form': form,
+        'property': property_obj,
+        'is_update': True
+    }
+    return render(request, 'properties/form.html', context)
 
 
 def property_map(request):
