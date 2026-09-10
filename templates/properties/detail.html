@@ -255,7 +255,7 @@
 
                 <h6 style="font-weight:700;color:var(--navy);margin-bottom:14px;">تواصل مع المالك</h6>
 
-                {% with phone_num=property.phone|default:property.owner.phone %}
+                {% with phone_num=property.phone %}
                 {% if phone_num %}
                     <!-- عرض الرقم نفسه -->
                     <div class="p-2 mb-2 text-center rounded-3" style="background:var(--light-bg); border: 1px dashed var(--navy); dir: ltr;">
