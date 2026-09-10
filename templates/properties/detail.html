@@ -10,8 +10,8 @@
             <div style="background:#fff;border-radius:16px;overflow:hidden;border:0.5px solid #dde3eb;">
                 {% with property.images.first as main_img %}
                 {% if main_img %}
-                <img src="{{ main_img.image.url }}" alt="{{ property.title }}"
-                     style="width:100%;height:420px;object-fit:cover;">
+                <img id="mainPropertyImg" src="{{ main_img.image.url }}" alt="{{ property.title }}"
+                     style="width:100%;height:420px;object-fit:cover;transition:0.3s ease;">
                 {% else %}
                 <div style="height:420px;background:linear-gradient(135deg,var(--navy),var(--navy-2));
                             display:flex;align-items:center;justify-content:center;">
@@ -28,7 +28,9 @@
                 <div class="d-flex gap-2 p-3" style="overflow-x:auto;">
                     {% for img in property.images.all %}
                     <img src="{{ img.image.url }}"
-                         style="height:80px;width:120px;object-fit:cover;border-radius:8px;cursor:pointer;flex-shrink:0;">
+                         onclick="changeMainImage(this.src)"
+                         class="gallery-thumb"
+                         style="height:80px;width:120px;object-fit:cover;border-radius:8px;cursor:pointer;flex-shrink:0;opacity:0.8;transition:0.2s;">
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -258,7 +260,7 @@
                 {% with phone_num=property.phone %}
                 {% if phone_num %}
                     <!-- عرض الرقم -->
-                    <div class="p-2 mb-2 text-center rounded-3" style="background:var(--light-bg); border: 1px dashed var(--navy); dir: ltr;">
+                    <div class="p-2 mb-2 text-center rounded-3" style="background:var(--light-bg); border: 1px dashed var(--navy);">
                         <i class="fas fa-phone-alt me-2" style="color:var(--gold);"></i>
                         <span style="font-weight:700; font-size:1.1rem; color:var(--navy); direction: ltr; display: inline-block;">
                             {{ phone_num }}
@@ -271,7 +273,7 @@
                     </a>
 
                     <!-- زر الواتساب -->
-                    <a href="https://wa.me/{{ phone_num|slugify }}" target="_blank" class="w-100 mb-2 py-2 d-flex align-items-center justify-content-center"
+                    <a href="https://wa.me/{{ phone_num }}" target="_blank" class="w-100 mb-2 py-2 d-flex align-items-center justify-content-center"
                        style="background:#25d366;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.95rem;">
                         <i class="fab fa-whatsapp me-2 fa-lg"></i>مراسلة عبر واتساب
                     </a>
@@ -309,6 +311,14 @@
 
 {% block extra_js %}
 <script>
+    // تغيير الصورة الرئيسية عند الضغط على المصغرات
+    function changeMainImage(src) {
+        const mainImg = document.getElementById('mainPropertyImg');
+        if (mainImg) {
+            mainImg.src = src;
+        }
+    }
+
     // نجوم تفاعلية
     const stars = document.querySelectorAll('.star-label');
     const inputs = document.querySelectorAll('input[name="rating"]');
