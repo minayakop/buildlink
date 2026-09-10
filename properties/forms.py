@@ -14,6 +14,21 @@ class PropertyForm(forms.ModelForm):
             'latitude', 'longitude',
         ]
         widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'listing_type': forms.Select(attrs={'class': 'form-select'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'district': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'area': forms.NumberInput(attrs={'class': 'form-control'}),
+            'bedrooms': forms.NumberInput(attrs={'class': 'form-control'}),
+            'bathrooms': forms.NumberInput(attrs={'class': 'form-control'}),
+            'floor': forms.NumberInput(attrs={'class': 'form-control'}),
+            'finishing': forms.Select(attrs={'class': 'form-select'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'مثال: شقة فاخرة 3 غرف في القاهرة الجديدة'

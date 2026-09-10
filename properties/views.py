@@ -146,6 +146,19 @@ def property_add(request):
                     property=prop,
                     image=image,
                     is_main=(i == 0)
+                    images = request.FILES.getlist('images')
+            for img in images:
+                PropertyImage.objects.create(property=property_obj, image=img)
+                
+            messages.success(request, 'تم تحديث بيانات العقار بنجاح!')
+            return redirect('properties:detail', pk=property_obj.pk)
+    else:
+        form = PropertyForm(instance=property_obj)
+
+    return render(request, 'properties/form.html', {
+        'form': form,
+        'property': property_obj,
+        'is_update': True
                 )
 
             messages.success(request, '🎉 تم نشر إعلانك بنجاح! يظهر الآن للمشترين.')
