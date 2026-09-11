@@ -3,7 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}BuildLink{% endblock %}</title>
+    
+    <!-- وسوم تهيئة محركات البحث (SEO) -->
+    <title>{% block title %}BuildLink | منصة العقارات والتشطيبات الأولى في مصر{% endblock %}</title>
+    <meta name="description" content="BuildLink (بناء لينك) هي المنصة الأولى للعقارات والتشطيبات والمقاولات في مصر. ابحث عن شقق للبيع وللإيجار وتواصل مع أفضل مهندسي ومقاولي التشطيبات.">
+    <meta name="keywords" content="BuildLink, بناء لينك, عقارات مصر, تشطيبات, مقاولات, شقق للبيع, شقق للايجار, مهندس ديكور">
+    <meta name="author" content="BuildLink">
+    <meta name="robots" content="index, follow">
+
+    <!-- وسوم Open Graph لتحديد كيفية ظهور الموقع عند المشاركة على فيسبوك وسوشيال ميديا -->
+    <meta property="og:site_name" content="BuildLink">
+    <meta property="og:title" content="BuildLink - منصة العقارات والتشطيبات">
+    <meta property="og:description" content="ابحث عن عقارك المناسب وتواصل مع أفضل مقاولي ومهندسي التشطيبات عبر BuildLink.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+    <!-- البيانات المنظمة (JSON-LD) لمساعدة محركات البحث في فهم اسم علامتك التجارية -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "BuildLink",
+      "alternateName": "بناء لينك",
+      "url": "https://mina2.pythonanywhere.com/"
+    }
+    </script>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
